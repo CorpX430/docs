@@ -1,7 +1,7 @@
 ---
-title: "REST API Reference for SPCX Investor Holdings"
+title: "SPCX Market Holdings API: Shares and Cost Basis Data"
 sidebarTitle: "Holdings"
-description: "Fetch SPCX share holdings and average cost basis for any KitaFund investor. Use the holdings endpoint to display portfolio position data in your application."
+description: "Fetch SPCX share holdings and average cost basis for any KitaFund investor. Use this endpoint to display portfolio position data in your app."
 ---
 
 The Holdings API returns the current SPCX share position for a given investor — the number of shares allocated to them and the average price per share paid. Holdings are updated by the KitaFund platform team as deposits are confirmed and shares are allocated during the IPO access program.
@@ -45,7 +45,7 @@ Retrieve the holdings record for an investor identified by their email address.
 curl "https://spcxipo.live/api/holdings?email=ada.lovelace@example.com"
 ```
 
-```typescript TypeScript
+```javascript JavaScript
 const email = encodeURIComponent("ada.lovelace@example.com");
 const response = await fetch(
   `https://spcxipo.live/api/holdings?email=${email}`

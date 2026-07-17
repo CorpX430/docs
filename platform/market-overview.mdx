@@ -1,5 +1,5 @@
 ---
-title: "SPCX Live Market Data and Stock Overview"
+title: "SPCX Live Price, Interactive Chart, and Market Stats"
 sidebarTitle: "Market Overview"
 description: "View real-time SPCX price, key market statistics, an interactive price chart, and a snapshot of your current share holdings — all on one dashboard."
 ---
@@ -54,9 +54,12 @@ Tap or click any period button to instantly reload the chart for that timeframe.
 
 At the bottom of the dashboard, a dedicated Holdings card shows you a live summary of your investment position.
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Shares Owned" icon="chart-pie">
     The total number of SPCX shares credited to your account, displayed to four decimal places.
+  </Card>
+  <Card title="Average Cost" icon="calculator">
+    Your weighted average purchase price per share across all confirmed deposits, shown in USD.
   </Card>
   <Card title="Market Value" icon="dollar-sign">
     Your shares multiplied by the current live price, giving you an up-to-the-minute portfolio value in USD.
@@ -66,5 +69,5 @@ At the bottom of the dashboard, a dedicated Holdings card shows you a live summa
 If you do not yet own any shares, a **Deposit Funds** button appears in the Holdings card, taking you directly to the deposit flow to purchase your first shares.
 
 <Tip>
-  The dashboard refreshes price data and your portfolio value every 30 seconds automatically. Pull down to manually refresh on mobile, or reload the page on desktop, to fetch the very latest quote.
+  The dashboard refreshes price data and your portfolio value every 30 seconds automatically. Reload the page at any time to fetch the very latest quote immediately.
 </Tip>

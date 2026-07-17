@@ -1,7 +1,7 @@
 ---
-title: "SPCX API Authentication: Sign In with Email"
+title: "KitaFund SPCX API: Authenticate Investors by Email"
 sidebarTitle: "Authentication"
-description: "Authenticate investors on the SPCX Market platform by email. Returns account status, full name, and approval state for use in your mobile or web integration."
+description: "Authenticate KitaFund SPCX investors by email address. Returns account status, full name, and approval state for mobile or web integrations."
 ---
 
 The SPCX Market API uses email-based look-up as its authentication mechanism. There are no API keys or session tokens issued to end users — calling `POST /api/auth/signin` with a registered email returns the investor's current account status, which your application uses to gate access to platform features.
@@ -43,7 +43,7 @@ curl -X POST https://spcxipo.live/api/auth/signin \
   -d '{"email": "ada.lovelace@example.com"}'
 ```
 
-```typescript TypeScript
+```javascript JavaScript
 const response = await fetch("https://spcxipo.live/api/auth/signin", {
   method: "POST",
   headers: { "Content-Type": "application/json" },

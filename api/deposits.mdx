@@ -1,7 +1,7 @@
 ---
-title: "REST API Endpoints for SPCX Crypto Deposits"
+title: "KitaFund SPCX Crypto Deposits and Wallet Addresses"
 sidebarTitle: "Deposits"
-description: "Submit crypto deposit requests and retrieve current wallet addresses for BTC, ETH, and DOGE via the KitaFund SPCX Market Deposits API. No authentication required."
+description: "Submit crypto deposit requests and retrieve current wallet addresses for BTC, ETH, and DOGE via the KitaFund SPCX Market Deposits API."
 ---
 
 The Deposits API enables investors to submit fund transfer requests and retrieve the live crypto wallet addresses they should send funds to. All deposit requests are recorded with a `pending` status and are reviewed and confirmed by the KitaFund operations team before shares are allocated.
@@ -25,7 +25,7 @@ Create a new deposit request for a registered investor. The investor is identifi
 </ParamField>
 
 <ParamField body="method" type="string" required>
-  The payment method. Currently the only accepted value is `"crypto"`.
+  The payment method. The only accepted value is `"crypto"`.
 </ParamField>
 
 <ParamField body="coin" type="string">
@@ -51,7 +51,7 @@ Create a new deposit request for a registered investor. The investor is identifi
 </ResponseField>
 
 <ResponseField name="method" type="string">
-  Payment method used. Currently always `"crypto"`.
+  Payment method used. Always `"crypto"`.
 </ResponseField>
 
 <ResponseField name="coin" type="string | null">
@@ -80,7 +80,7 @@ curl -X POST https://spcxipo.live/api/deposits \
   }'
 ```
 
-```typescript TypeScript
+```javascript JavaScript
 const response = await fetch("https://spcxipo.live/api/deposits", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -154,7 +154,7 @@ Returns a JSON array where each element represents one supported cryptocurrency.
 curl https://spcxipo.live/api/deposit-addresses
 ```
 
-```typescript TypeScript
+```javascript JavaScript
 const response = await fetch("https://spcxipo.live/api/deposit-addresses");
 const addresses = await response.json();
 

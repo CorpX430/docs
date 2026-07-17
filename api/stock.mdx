@@ -1,7 +1,7 @@
 ---
-title: "SPCX Stock Quote and Price History API Reference"
+title: "SPCX Market API: Live Stock Quotes and Price History"
 sidebarTitle: "Stock"
-description: "Fetch live SPCX price quotes, market statistics, and historical price data for any time period. All stock endpoints are public and require no authentication."
+description: "Fetch live SPCX price quotes, market statistics, and historical price data for any supported period. Stock endpoints are public; no auth required."
 ---
 
 The Stock API surfaces real-time SPCX market data for display in your investor dashboard or charting components. Both endpoints are fully public — no authentication is required — making them safe to call directly from browser or mobile clients. Price values include a small random noise component to simulate live market movement.
@@ -64,6 +64,10 @@ Returns the current SPCX price alongside a full set of market statistics includi
   Lowest price recorded over the trailing 52 weeks in USD.
 </ResponseField>
 
+<ResponseField name="peRatio" type="number | null">
+  Price-to-earnings ratio. Returns `null` when earnings data is not yet available (as is typical for pre-IPO instruments).
+</ResponseField>
+
 <ResponseField name="avgVolume" type="string">
   Average daily trading volume over recent periods, formatted as a human-readable string.
 </ResponseField>
@@ -97,6 +101,7 @@ console.log(`SPCX: $${quote.price} (${quote.changePct}%)`);
   "dayHigh": 158.93,
   "week52High": 178.45,
   "week52Low": 135.00,
+  "peRatio": null,
   "avgVolume": "25.69M",
   "sharesOut": "13.00B"
 }
