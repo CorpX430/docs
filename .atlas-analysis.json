@@ -1,32 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": "KitaFund — SPCX Market",
+  "projectType": "saas",
+  "projectName": "KitaFund — SPCX Market",
+  "projectDescription": "A mobile-first investor access platform for SpaceX IPO shares, enabling approved investors to view live SPCX stock data, manage crypto deposits, track holdings, and access investor updates.",
   "theme": "luma",
-  "logo": {
-    "light": "https://media.brand.dev/a38f6687-e883-4998-938c-8408e861ff13.png",
-    "dark": "https://media.brand.dev/a38f6687-e883-4998-938c-8408e861ff13.png"
-  },
-  "favicon": "https://icons.duckduckgo.com/ip3/app.vercel.app.ico",
-  "colors": {
-    "primary": "#dd1919",
-    "light": "#343434",
-    "dark": "#dd1919"
-  },
-  "font": {
-    "headings": {
-      "family": "Inter"
-    },
-    "body": {
-      "family": "Inter"
-    }
-  },
-  "navbar": {
-    "primary": {
-      "type": "button",
-      "label": "Get Access",
-      "href": "https://spcxipo.live"
-    }
-  },
+  "primaryColor": "#dd1919",
+  "lightColor": "#343434",
+  "darkColor": null,
   "navigation": {
     "tabs": [
       {
@@ -103,7 +82,27 @@
       }
     ]
   },
-  "footer": {
-    "socials": {}
-  }
+  "keyFeatures": [
+    "Admin-approved investor onboarding with email notification",
+    "Live SPCX stock quote and price history chart via FMP API",
+    "Crypto deposits (BTC, ETH, DOGE) with admin-managed wallet addresses",
+    "Manual share crediting by admin with weighted average cost basis",
+    "Anonymous admin panel accessible only via passcode",
+    "Investor holdings tracking with real-time portfolio value",
+    "Investor Updates news feed with bond issuance and equity offering announcements",
+    "In-app AI support chat with account and order assistance",
+    "Passkey authentication support",
+    "Mobile-first dark space-themed UI"
+  ],
+  "publicApiSurface": [
+    "POST /api/auth/signin",
+    "POST /api/investors",
+    "GET /api/investors/:id",
+    "GET /api/holdings/:investorId",
+    "POST /api/deposits",
+    "GET /api/deposit-addresses",
+    "GET /api/stock/quote",
+    "GET /api/stock/history",
+    "GET /api/health"
+  ]
 }

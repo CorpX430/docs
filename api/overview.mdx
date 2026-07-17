@@ -1,0 +1,83 @@
+---
+title: "SPCX Market REST API Overview and Authentication"
+sidebarTitle: "Overview"
+description: "Complete reference for the KitaFund SPCX Market REST API — base URL, request/response format, HTTP status codes, and error handling for developers."
+---
+
+The KitaFund SPCX Market API is a JSON REST API that gives developers programmatic access to investor accounts, crypto deposit flows, portfolio holdings, and real-time SPCX stock data. All endpoints are served over HTTPS and accept `Content-Type: application/json` request bodies where applicable.
+
+## Base URL
+
+All API endpoints share a common base URL. If you are running a custom deployment on Vercel, substitute your project's domain.
+
+```bash
+https://spcxipo.live/api
+```
+
+For custom Vercel deployments:
+
+```bash
+https://your-deployment.vercel.app/api
+```
+
+## Request & Response Format
+
+Every request body and every response body is JSON. Set the `Content-Type` header to `application/json` on all `POST` requests.
+
+```bash
+Content-Type: application/json
+Accept: application/json
+```
+
+Responses always return a JSON object. Collection endpoints return JSON arrays. Timestamps are ISO 8601 strings (e.g. `"2025-11-03T14:22:00.000Z"`).
+
+## HTTP Status Codes
+
+| Code | Meaning |
+|------|---------|
+| `200` | **OK** — Request succeeded; response body contains the result. |
+| `201` | **Created** — Resource was successfully created. |
+| `400` | **Bad Request** — Missing or invalid request parameters. Check the `error` field for details. |
+| `404` | **Not Found** — The requested resource does not exist. |
+| `409` | **Conflict** — A unique constraint was violated (e.g. duplicate email registration). |
+| `500` | **Internal Server Error** — An unexpected server-side error occurred. |
+
+## Error Response Format
+
+All error responses follow a consistent shape with a single `error` field containing a human-readable message.
+
+```json
+{
+  "error": "No account found with this email."
+}
+```
+
+Use the HTTP status code to drive programmatic error handling, and surface the `error` string to end users or log it for debugging.
+
+## Health Check
+
+Send a `GET` request to `/api/health` to verify the API is reachable and the server is running. This endpoint requires no request body and returns a `200` with no significant payload — a successful response is sufficient confirmation.
+
+```bash
+curl https://spcxipo.live/api/health
+```
+
+## API Reference
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api/auth">
+    Sign in with an investor email address and retrieve account status.
+  </Card>
+  <Card title="Investors" icon="user" href="/api/investors">
+    Register new investor accounts and look up existing investor details.
+  </Card>
+  <Card title="Holdings" icon="chart-pie" href="/api/holdings">
+    Retrieve the share count and average cost basis for an investor portfolio.
+  </Card>
+  <Card title="Deposits" icon="circle-dollar-to-slot" href="/api/deposits">
+    Submit crypto deposit requests and fetch current wallet addresses.
+  </Card>
+  <Card title="Stock" icon="chart-line" href="/api/stock">
+    Get live SPCX price quotes and historical price data for charts.
+  </Card>
+</CardGroup>

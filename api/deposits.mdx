@@ -1,0 +1,189 @@
+---
+title: "REST API Endpoints for SPCX Crypto Deposits"
+sidebarTitle: "Deposits"
+description: "Submit crypto deposit requests and retrieve current wallet addresses for BTC, ETH, and DOGE via the KitaFund SPCX Market Deposits API. No authentication required."
+---
+
+The Deposits API enables investors to submit fund transfer requests and retrieve the live crypto wallet addresses they should send funds to. All deposit requests are recorded with a `pending` status and are reviewed and confirmed by the KitaFund operations team before shares are allocated.
+
+---
+
+## POST /api/deposits
+
+Create a new deposit request for a registered investor. The investor is identified by email address — no session token is required. On success the API returns `201 Created` with the full deposit record.
+
+**Endpoint:** `POST /api/deposits`
+
+### Request Body
+
+<ParamField body="email" type="string" required>
+  Email address of the registered investor submitting the deposit. Must match an existing investor record.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  The deposit amount in USD. Must be a positive number greater than or equal to `1`.
+</ParamField>
+
+<ParamField body="method" type="string" required>
+  The payment method. Currently the only accepted value is `"crypto"`.
+</ParamField>
+
+<ParamField body="coin" type="string">
+  The cryptocurrency being sent. Required when `method` is `"crypto"`. Accepted values: `"BTC"`, `"ETH"`, `"DOGE"`.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="id" type="number">
+  Auto-assigned unique integer identifier for this deposit record.
+</ResponseField>
+
+<ResponseField name="investorId" type="number">
+  The ID of the investor account this deposit is linked to.
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Normalised email address of the investor.
+</ResponseField>
+
+<ResponseField name="amount" type="string">
+  The submitted deposit amount as a numeric string, e.g. `"2500"`.
+</ResponseField>
+
+<ResponseField name="method" type="string">
+  Payment method used. Currently always `"crypto"`.
+</ResponseField>
+
+<ResponseField name="coin" type="string | null">
+  The cryptocurrency coin selected, e.g. `"BTC"`. `null` if no coin was specified.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Initial status of the deposit. Always `"pending"` for newly created records.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  ISO 8601 timestamp of when the deposit was submitted.
+</ResponseField>
+
+### Code Example
+
+<CodeGroup>
+```bash curl
+curl -X POST https://spcxipo.live/api/deposits \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "ada.lovelace@example.com",
+    "amount": 2500,
+    "method": "crypto",
+    "coin": "BTC"
+  }'
+```
+
+```typescript TypeScript
+const response = await fetch("https://spcxipo.live/api/deposits", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    email: "ada.lovelace@example.com",
+    amount: 2500,
+    method: "crypto",
+    coin: "BTC",
+  }),
+});
+
+const deposit = await response.json();
+```
+</CodeGroup>
+
+### Success Response
+
+```json
+{
+  "id": 101,
+  "investorId": 42,
+  "email": "ada.lovelace@example.com",
+  "amount": "2500",
+  "method": "crypto",
+  "coin": "BTC",
+  "status": "pending",
+  "createdAt": "2025-11-03T15:45:00.000Z"
+}
+```
+
+<Note>
+  The minimum recommended deposit amount for IPO participation is **$1,500 USD**. While the API accepts any amount ≥ 1, allocations are subject to minimum thresholds set by the KitaFund compliance team. Deposits below $1,500 may not qualify for share allocation.
+</Note>
+
+### Error Responses
+
+| Status | Error message | Cause |
+|--------|--------------|-------|
+| `400` | `"Invalid input."` | One or more required fields are missing, the `amount` is less than 1, the `method` is not `"crypto"`, or the `coin` value is not one of `BTC`, `ETH`, `DOGE`. |
+| `404` | `"Investor not found."` | No investor account is registered for the provided email address. |
+| `500` | `"Something went wrong."` | Unexpected server error. |
+
+---
+
+## GET /api/deposit-addresses
+
+Retrieve the current list of crypto wallet addresses that investors should send funds to. This endpoint is public and requires no authentication.
+
+**Endpoint:** `GET /api/deposit-addresses`
+
+### Response Fields
+
+Returns a JSON array where each element represents one supported cryptocurrency.
+
+<ResponseField name="coin" type="string">
+  The ticker symbol of the cryptocurrency, e.g. `"BTC"`, `"ETH"`, `"DOGE"`.
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  The current wallet address investors should send this coin to.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  ISO 8601 timestamp of the last time this address was updated by the platform team.
+</ResponseField>
+
+### Code Example
+
+<CodeGroup>
+```bash curl
+curl https://spcxipo.live/api/deposit-addresses
+```
+
+```typescript TypeScript
+const response = await fetch("https://spcxipo.live/api/deposit-addresses");
+const addresses = await response.json();
+
+const btcAddress = addresses.find((a) => a.coin === "BTC")?.address;
+```
+</CodeGroup>
+
+### Success Response
+
+```json
+[
+  {
+    "coin": "BTC",
+    "address": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    "updatedAt": "2025-11-01T08:00:00.000Z"
+  },
+  {
+    "coin": "ETH",
+    "address": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+    "updatedAt": "2025-11-01T08:00:00.000Z"
+  },
+  {
+    "coin": "DOGE",
+    "address": "DH5yaieqoZN36fDVciNyRueRGvGLR3mr7L",
+    "updatedAt": "2025-11-01T08:00:00.000Z"
+  }
+]
+```
+
+<Warning>
+  Always fetch the latest wallet addresses from this endpoint immediately before displaying them to an investor or instructing them to send funds. Crypto wallet addresses may be rotated by the KitaFund platform team at any time. Sending funds to a stale address could result in irreversible loss of funds.
+</Warning>

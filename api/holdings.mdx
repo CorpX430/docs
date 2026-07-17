@@ -1,0 +1,97 @@
+---
+title: "REST API Reference for SPCX Investor Holdings"
+sidebarTitle: "Holdings"
+description: "Fetch SPCX share holdings and average cost basis for any KitaFund investor. Use the holdings endpoint to display portfolio position data in your application."
+---
+
+The Holdings API returns the current SPCX share position for a given investor — the number of shares allocated to them and the average price per share paid. Holdings are updated by the KitaFund platform team as deposits are confirmed and shares are allocated during the IPO access program.
+
+---
+
+## GET /api/holdings
+
+Retrieve the holdings record for an investor identified by their email address.
+
+**Endpoint:** `GET /api/holdings?email={email}`
+
+### Query Parameters
+
+<ParamField query="email" type="string" required>
+  The registered email address of the investor whose holdings you want to retrieve. The value is normalised to lowercase before the lookup.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="investorId" type="number">
+  The unique integer ID of the investor this holdings record belongs to.
+</ResponseField>
+
+<ResponseField name="shares" type="string">
+  The number of SPCX shares currently allocated to the investor, represented as a numeric string (e.g. `"250"`). Returns `"0"` when the investor has no allocation yet.
+</ResponseField>
+
+<ResponseField name="avgCost" type="string">
+  The average cost per share paid by the investor, represented as a numeric string (e.g. `"143.20"`). Returns `"0"` when there are no allocations.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  ISO 8601 timestamp of the last time the holdings record was modified. When no holdings record exists yet, this reflects the current server time at the moment of the request.
+</ResponseField>
+
+### Code Example
+
+<CodeGroup>
+```bash curl
+curl "https://spcxipo.live/api/holdings?email=ada.lovelace@example.com"
+```
+
+```typescript TypeScript
+const email = encodeURIComponent("ada.lovelace@example.com");
+const response = await fetch(
+  `https://spcxipo.live/api/holdings?email=${email}`
+);
+const holdings = await response.json();
+// {
+//   investorId: 42,
+//   shares: "250",
+//   avgCost: "143.20",
+//   updatedAt: "2025-11-20T09:15:00.000Z"
+// }
+```
+</CodeGroup>
+
+### Success Response
+
+```json
+{
+  "investorId": 42,
+  "shares": "250",
+  "avgCost": "143.20",
+  "updatedAt": "2025-11-20T09:15:00.000Z"
+}
+```
+
+### Zero-Holdings Response
+
+When an investor is registered but has not yet received an allocation, the API returns a zeroed holdings object rather than a `404` error.
+
+```json
+{
+  "investorId": 42,
+  "shares": "0",
+  "avgCost": "0",
+  "updatedAt": "2025-11-20T09:15:00.000Z"
+}
+```
+
+<Note>
+  A `404` is returned only when the email address does not match any registered investor. An investor who is registered but has no share allocation yet will receive the zeroed response shown above. Parse `shares` and `avgCost` as floats in your UI before performing arithmetic.
+</Note>
+
+### Error Responses
+
+| Status | Error message | Cause |
+|--------|--------------|-------|
+| `400` | `"Email is required."` | The `email` query parameter was not provided. |
+| `404` | `"Investor not found."` | No investor record exists for the supplied email address. |
+| `500` | `"Something went wrong."` | Unexpected server error. |

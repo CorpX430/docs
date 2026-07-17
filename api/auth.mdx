@@ -1,0 +1,98 @@
+---
+title: "SPCX API Authentication: Sign In with Email"
+sidebarTitle: "Authentication"
+description: "Authenticate investors on the SPCX Market platform by email. Returns account status, full name, and approval state for use in your mobile or web integration."
+---
+
+The SPCX Market API uses email-based look-up as its authentication mechanism. There are no API keys or session tokens issued to end users — calling `POST /api/auth/signin` with a registered email returns the investor's current account status, which your application uses to gate access to platform features.
+
+---
+
+## POST /api/auth/signin
+
+Check whether an email address has a registered investor account and retrieve the account's current approval status.
+
+**Endpoint:** `POST /api/auth/signin`
+
+### Request Body
+
+<ParamField body="email" type="string" required>
+  The investor's email address. The API normalises the value to lowercase before lookup — casing is not significant.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="status" type="string">
+  The current approval state of the investor account. See [Investor Status Values](#investor-status-values) below.
+</ResponseField>
+
+<ResponseField name="fullName" type="string">
+  The investor's full name as provided at registration.
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  The normalised (lowercase) email address on file for this account.
+</ResponseField>
+
+### Code Examples
+
+<CodeGroup>
+```bash curl
+curl -X POST https://spcxipo.live/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"email": "ada.lovelace@example.com"}'
+```
+
+```typescript TypeScript
+const response = await fetch("https://spcxipo.live/api/auth/signin", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email: "ada.lovelace@example.com" }),
+});
+
+const data = await response.json();
+// { status: "approved", fullName: "Ada Lovelace", email: "ada.lovelace@example.com" }
+```
+</CodeGroup>
+
+### Success Response
+
+```json
+{
+  "status": "approved",
+  "fullName": "Ada Lovelace",
+  "email": "ada.lovelace@example.com"
+}
+```
+
+### Investor Status Values
+
+The `status` field indicates where the investor is in the KitaFund onboarding pipeline.
+
+| Value | Meaning |
+|-------|---------|
+| `pending` | The account has been created but is awaiting review by the KitaFund compliance team. The investor cannot yet access allocation features. |
+| `approved` | The account has passed review. The investor is fully onboarded and may submit deposits and receive SPCX share allocations. |
+| `rejected` | The account application was reviewed and declined. The investor should contact support for further guidance. |
+
+### Error Responses
+
+| Status | Error message | Cause |
+|--------|--------------|-------|
+| `400` | `"Email is required."` | Request body is missing the `email` field or the value is not a valid email address. |
+| `404` | `"No account found with this email."` | No investor record exists for the provided email. Direct the user to register first. |
+| `500` | `"Something went wrong. Please try again."` | Unexpected server error. Retry with exponential back-off. |
+
+---
+
+## GET /api/health
+
+A lightweight liveness probe with no required parameters. Returns `200 OK` when the API server is running and reachable.
+
+```bash
+curl https://spcxipo.live/api/health
+```
+
+<Tip>
+  Integrate this endpoint into your deployment pipeline or uptime monitor to receive early warning of API outages before they affect investor-facing flows.
+</Tip>

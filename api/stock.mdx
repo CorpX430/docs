@@ -1,0 +1,186 @@
+---
+title: "SPCX Stock Quote and Price History API Reference"
+sidebarTitle: "Stock"
+description: "Fetch live SPCX price quotes, market statistics, and historical price data for any time period. All stock endpoints are public and require no authentication."
+---
+
+The Stock API surfaces real-time SPCX market data for display in your investor dashboard or charting components. Both endpoints are fully public — no authentication is required — making them safe to call directly from browser or mobile clients. Price values include a small random noise component to simulate live market movement.
+
+---
+
+## GET /api/stock/quote
+
+Returns the current SPCX price alongside a full set of market statistics including bid/ask spread, daily range, 52-week range, market cap, and volume figures.
+
+**Endpoint:** `GET /api/stock/quote`
+
+### Response Fields
+
+<ResponseField name="symbol" type="string">
+  The ticker symbol. Always `"SPCX"`.
+</ResponseField>
+
+<ResponseField name="price" type="number">
+  Current market price of one SPCX share in USD. Includes minor live variation on each request.
+</ResponseField>
+
+<ResponseField name="change" type="number">
+  Absolute price change from the previous close, in USD. Negative values indicate a decline.
+</ResponseField>
+
+<ResponseField name="changePct" type="number">
+  Percentage price change from the previous close. Negative values indicate a decline.
+</ResponseField>
+
+<ResponseField name="volume" type="string">
+  Today's trading volume, formatted as a human-readable string (e.g. `"25.69M"`).
+</ResponseField>
+
+<ResponseField name="marketCap" type="string">
+  Total market capitalisation, formatted as a human-readable string (e.g. `"$1.92T"`).
+</ResponseField>
+
+<ResponseField name="bid" type="number">
+  Current best bid price in USD.
+</ResponseField>
+
+<ResponseField name="ask" type="number">
+  Current best ask price in USD.
+</ResponseField>
+
+<ResponseField name="dayLow" type="number">
+  Lowest trade price so far today in USD.
+</ResponseField>
+
+<ResponseField name="dayHigh" type="number">
+  Highest trade price so far today in USD.
+</ResponseField>
+
+<ResponseField name="week52High" type="number">
+  Highest price recorded over the trailing 52 weeks in USD.
+</ResponseField>
+
+<ResponseField name="week52Low" type="number">
+  Lowest price recorded over the trailing 52 weeks in USD.
+</ResponseField>
+
+<ResponseField name="avgVolume" type="string">
+  Average daily trading volume over recent periods, formatted as a human-readable string.
+</ResponseField>
+
+<ResponseField name="sharesOut" type="string">
+  Total shares outstanding, formatted as a human-readable string (e.g. `"13.00B"`).
+</ResponseField>
+
+### Code Example
+
+```javascript
+const response = await fetch("https://spcxipo.live/api/stock/quote");
+const quote = await response.json();
+
+console.log(`SPCX: $${quote.price} (${quote.changePct}%)`);
+```
+
+### Example Response
+
+```json
+{
+  "symbol": "SPCX",
+  "price": 147.62,
+  "change": -1.86,
+  "changePct": -1.24,
+  "volume": "25.69M",
+  "marketCap": "$1.92T",
+  "bid": 147.63,
+  "ask": 147.72,
+  "dayLow": 147.36,
+  "dayHigh": 158.93,
+  "week52High": 178.45,
+  "week52Low": 135.00,
+  "avgVolume": "25.69M",
+  "sharesOut": "13.00B"
+}
+```
+
+---
+
+## GET /api/stock/history
+
+Returns a time-series array of SPCX price data for use in charts. The resolution and number of data points returned automatically adjusts based on the requested period.
+
+**Endpoint:** `GET /api/stock/history?period={period}`
+
+### Query Parameters
+
+<ParamField query="period" type="string">
+  The time window to retrieve price history for. Accepted values:
+
+  | Value | Resolution | Data points |
+  |-------|-----------|-------------|
+  | `1D` | 5-minute intervals | 120 |
+  | `1W` | 1-hour intervals | 168 |
+  | `1M` | 6-hour intervals | 120 |
+  | `3M` | Daily | 90 |
+  | `1Y` | Daily | 252 |
+  | `5Y` | Weekly | 260 |
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="period" type="string">
+  The period value echoed back from the request (e.g. `"1D"`).
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An ordered array of price data points from oldest to newest.
+
+  <ResponseField name="data[].time" type="string">
+    Human-readable time label. Format varies by period:
+    - `1D` → `"14:35"` (24-hour HH:MM)
+    - `1W`, `1M` → `"Nov 3"` (month + day)
+    - `3M`, `1Y`, `5Y` → `"Nov '25"` (month + 2-digit year)
+  </ResponseField>
+
+  <ResponseField name="data[].price" type="number">
+    SPCX price in USD at that point in time, rounded to two decimal places.
+  </ResponseField>
+</ResponseField>
+
+### Code Example
+
+<CodeGroup>
+```bash curl
+curl "https://spcxipo.live/api/stock/history?period=1W"
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://spcxipo.live/api/stock/history?period=1W"
+);
+const { period, data } = await response.json();
+
+// data is ready to pass directly to a charting library
+const chartPoints = data.map(({ time, price }) => ({ x: time, y: price }));
+```
+</CodeGroup>
+
+### Example Response (truncated)
+
+```json
+{
+  "period": "1W",
+  "data": [
+    { "time": "Oct 28", "price": 144.31 },
+    { "time": "Oct 29", "price": 145.88 },
+    { "time": "Oct 30", "price": 146.54 },
+    { "time": "Oct 31", "price": 145.10 },
+    { "time": "Nov 1",  "price": 147.03 },
+    { "time": "Nov 2",  "price": 146.79 },
+    { "time": "Nov 3",  "price": 147.62 }
+  ]
+}
+```
+
+<Note>
+  The `period` query parameter defaults to `"1D"` if omitted or if an unrecognised value is supplied. Price history is procedurally generated to simulate realistic market movement ending near the current base price — it is refreshed on each request and is not persisted between calls.
+</Note>
